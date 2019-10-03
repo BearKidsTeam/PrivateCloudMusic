@@ -25,7 +25,8 @@ namespace Pcm.Proxy
             
             register(CMD.ListMusic, music.List); // 200
             register(CMD.GetPlaylist, playlist.Get); // 201
-            register(CMD.ListSearch, category.Search); // 206
+            register(CMD.ListSearch, category.ListSearch); // 206
+            register(CMD.ListByAlbumArtist, category.ListByAlbumArtist);
 
             register(CMD.ListPlaylist, playlist.List); // 301 
             register(CMD.ListByAlbum, category.ListByAlbum); // 302

@@ -11,6 +11,9 @@ namespace Pcm.Utils
         {
             if (s == null) s = string.Empty;
             if (t == null) t = string.Empty;
+
+            if (s.Contains(t) && !string.IsNullOrEmpty(t)) return 0;
+            if (t.Contains(s) && !string.IsNullOrEmpty(s)) return 0;
             
             var bounds = new { Height = s.Length + 1, Width = t.Length + 1 };
  

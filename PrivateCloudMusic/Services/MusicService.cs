@@ -76,7 +76,7 @@ namespace Pcm.Services
                 }
             
                 var tfile = TagLib.File.Create(filePath);
-                
+
                 if ((tfile.Properties.MediaTypes & MediaTypes.Audio) != 0)
                 {
                     var id = ObjectId.NewObjectId();
@@ -88,13 +88,14 @@ namespace Pcm.Services
                         Album = tfile.Tag.Album,
                         Genres = tfile.Tag.Genres,
                         Performers = tfile.Tag.Performers,
+                        AlbumArtists = tfile.Tag.AlbumArtists,
                         Track = tfile.Tag.Track,
                         TrackCount = tfile.Tag.TrackCount,
                         PictureCount = tfile.Tag.Pictures.Count(),
                         Length = (int)tfile.Properties.Duration.TotalSeconds,
                         MimeType = tfile.MimeType,
                         FilePath = filePath,
-                        PlayCount = 0,
+                        PlayCount = 0
                     };
             
                     Collection.Insert(music);

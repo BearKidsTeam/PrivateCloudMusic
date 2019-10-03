@@ -13,6 +13,7 @@ namespace Pcm.Entities
         public string Album { get; set; }
         public string[] Genres { get; set; }
         public string[] Performers { get; set; }
+        public string[] AlbumArtists { get; set; }
         
         public uint Track { get; set; }
         public uint TrackCount { get; set; }
@@ -31,6 +32,7 @@ namespace Pcm.Entities
             Album = Album ?? string.Empty,
             Genres = { Genres },
             Performers = { Performers },
+            AlbumArtists = { AlbumArtists },
             Track = Track,
             TrackCount = TrackCount != 0 ? TrackCount : Track,
             PictureCount = PictureCount,

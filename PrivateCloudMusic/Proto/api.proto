@@ -25,6 +25,10 @@ message ListSearchRequestBody {
     string keyword = 1;
 }
 
+message ListByAlbumArtistsRequestBody {
+
+}
+
 // response
 
 message GetMusicResponseBody {
@@ -33,14 +37,15 @@ message GetMusicResponseBody {
     string album = 3;
     repeated string genres = 4;
     repeated string performers = 5;
-    uint32 track = 6;
-    uint32 track_count = 7;
-    string file_name = 8;
-    int32 play_count = 9;
-    int32 picture_count = 10;
-    int64 length = 11;
-    string mime_type = 12;
-    int64 created_at = 13;
+    repeated string album_artists = 6;
+    uint32 track = 7;
+    uint32 track_count = 8;
+    string file_name = 9;
+    int32 play_count = 10;
+    int32 picture_count = 11;
+    int64 length = 12;
+    string mime_type = 13;
+    int64 created_at = 14;
 }
 
 message ListMusicResponseBody {
@@ -57,6 +62,10 @@ message ListByPerformerResponseBody {
 
 message ListSearchResponseBody {
     repeated GetMusicResponseBody musics = 1;
+}
+
+message ListByAlbumArtistsResponseBody {
+    map<string, ListMusicResponseBody> artists = 1;
 }
 
 // base
@@ -80,6 +89,7 @@ message RequestBody {
     // 204
     // 205
     ListSearchRequestBody list_search_body = 206;
+    ListByAlbumArtistsRequestBody list_by_album_artist_body = 207;
 }
 
 
@@ -102,6 +112,7 @@ message ResponseBody {
     // 204
     // 205
     ListSearchResponseBody list_search_body = 206;
+    ListByAlbumArtistsResponseBody list_by_album_artist_body = 207;
 }
 
 
@@ -117,6 +128,7 @@ enum CMD {
     LIST_BY_GENRE = 204;
     LIST_FOLDER_TREE = 205;
     LIST_SEARCH = 206;
+    LIST_BY_ALBUM_ARTIST = 207;
 
     GET_PLAYLIST = 300;
 
