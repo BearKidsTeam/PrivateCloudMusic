@@ -1,0 +1,111 @@
+syntax = "proto3";
+package pcm;
+
+option csharp_namespace = "Pcm.Proto";
+
+// request
+
+message GetMusicRequestBody {
+    string id = 1;
+}
+
+message GetMusicResponseBody {
+    string title = 1;
+    string album = 2;
+    repeated string genres = 3;
+    repeated string performers = 4;
+    uint32 track = 5;
+    uint32 track_count = 6;
+    string file_name = 7;
+    int32 play_count = 8;
+    int64 length = 9;
+    string mime_type = 10;
+    int64 created_at = 11;
+}
+
+// response
+
+// base
+
+message Request {
+    int32 cmd = 1; // refer to enum CMD
+    int64 sequence_id = 2;
+    string sdk_version = 3;
+    string token = 4;
+    Refer refer = 5;
+    RequestBody body = 6;
+    map<string, string> headers = 7;
+}
+
+message RequestBody {
+    GetMusicRequestBody get_music_body = 100;
+}
+
+enum CMD {
+    CMD_NOT_USED = 0;
+    
+    GET_MUSIC = 100;
+
+    LIST_MUSIC = 200;
+    LIST_PLAYLIST = 201;
+    LIST_ALBUM = 202;
+    LIST_ARTIST = 203;
+    LIST_TYPE = 204;
+    LIST_FOLDER_TREE = 205;
+    
+    GET_PLAYLIST = 300;
+    GET_ALBUM = 301;
+    GET_ARTIST = 302;
+    GET_TYPE = 303;
+    GET_FOLDER = 304;
+    
+    ACTION_RESCAN_MUSIC = 400;
+    ACTION_MODIFY_MUSIC_EXT = 401;
+    ACTION_ADD_MUSIC = 402;
+    ACTION_DELETE_MUSIC = 403;
+    ACTION_CREATE_PLAYLIST = 404;
+    ACTION_RENAME_PLAYLIST = 405;
+    ACTION_ADD_MUSIC_TO_PLAYLIST = 406;
+    ACTION_REMOVE_MUSIC_FROM_PLAYLIST = 407;
+    ACTION_DELETE_PLAYLIST = 408;
+    
+    REPORT_PLAYER_START = 500;
+    REPORT_MUSIC_STOP = 503;
+}
+
+enum Refer {
+    REFER_NOT_USED = 0;
+    ANDROID = 1;
+    IOS = 2;
+    PC = 3;
+    SERVER = 4;
+}
+
+message Response {
+    int32 cmd = 1;
+    int64 sequence_id = 2; //Same as request
+    int32 status_code = 3; //refer to enum StatusCode
+    string error_desc = 4;
+    ResponseBody body = 6;
+    string log_id = 7;
+    map<string, string> extra = 8;
+}
+
+message ResponseBody {
+    GetMusicResponseBody get_music_body = 100;
+}
+
+enum StatusCode {
+    OK = 0;
+    INVALID_TOKEN = 1;
+    EXPIRED_TOKEN = 2;
+    
+    INVALID_REQUEST = 3;
+    INVALID_CMD = 4;
+    SERVER_ERR = 5;
+}
+
+service Pcm {
+    rpc SendRequest(Request) returns (Response);
+}
+
