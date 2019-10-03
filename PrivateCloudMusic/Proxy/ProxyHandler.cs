@@ -4,11 +4,9 @@ using System.Net.WebSockets;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
-using System.Buffers;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Net.Http.Headers;
 using System.Text;
 using Google.Protobuf;
 using Microsoft.AspNetCore.Routing;
@@ -20,7 +18,7 @@ using Pcm.Services;
 
 namespace Pcm.Proxy
 {
-    public class MessageHandler
+    public class ProxyHandler
     {
         private readonly Dictionary<string, WebSocket> _webSockets = new Dictionary<string, WebSocket>();
 
@@ -30,7 +28,7 @@ namespace Pcm.Proxy
         
         private readonly Router _router = new Router();
 
-        public MessageHandler()
+        public ProxyHandler()
         {
             addMiddlewares();
             addParser();
@@ -41,8 +39,11 @@ namespace Pcm.Proxy
 
         private void addMiddlewares()
         {
+            // outer
             _middlewares.Add(new Logging());
             _middlewares.Add(new Preset());
+            // inner
+            // router
         }
 
         private void addParser()
@@ -163,6 +164,31 @@ namespace Pcm.Proxy
             ctx.Response.Headers[HeaderNames.ContentDisposition] = "attachment; filename=" + WebUtility.UrlEncode(music.FileName);
             
             await ctx.Response.SendFileAsync(fi);
+        }
+
+        public async Task HandleCover(HttpContext ctx)
+        {
+            var id = ctx.GetRouteValue("id").ToString();
+            var indexObj = ctx.GetRouteValue("index");
+            var index = 0;
+            if (indexObj != null)
+            {
+                index = int.Parse(indexObj.ToString());
+            }
+
+            var music = MusicService.Instance.Get(id);
+            if (music == null)
+            {
+                throw new FileNotFoundException();
+            }
+            
+            var tfile = TagLib.File.Create(music.FilePath);
+            index = Math.Max(0, index);
+            index = Math.Min(index, tfile.Tag.Pictures.Count() - 1);
+            var img = tfile.Tag.Pictures[index];
+            
+            ctx.Response.ContentType = img.MimeType;
+            await ctx.Response.BodyWriter.WriteAsync(img.Data.Data);
         }
     }
 }

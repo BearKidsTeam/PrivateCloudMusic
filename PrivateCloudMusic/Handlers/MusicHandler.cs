@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Threading.Tasks;
 using Pcm.Proto;
 using Pcm.Proxy;
@@ -12,27 +13,20 @@ namespace Pcm.Handlers
             var music = MusicService.Instance.Get(req.Body.GetMusicBody.Id);
             if (music != null)
             {
-                resp.Body.GetMusicBody = new GetMusicResponseBody()
-                {
-                    Title = music.Title,
-                    Album = music.Album,
-                    Genres = { music.Genres },
-                    Performers = { music.Performers },
-                    Track = music.Track,
-                    TrackCount = music.TrackCount,
-                    FileName = music.FileName,
-                    PlayCount = music.PlayCount,
-                    Length = music.Length,
-                    MimeType = music.MimeType,
-                    CreatedAt = music.MusicId.Timestamp
-                };
+                resp.Body.GetMusicBody = music;
             }
 
             return await Task.FromResult(StatusCode.Ok);
         }
-        
+
         public async Task<StatusCode> List(Context ctx, Request req, Response resp)
         {
+            var musics = MusicService.Instance.Collection.FindAll();
+            resp.Body.ListMusicBody = new ListMusicResponseBody()
+            {
+                Musics = { musics.Select(m => m.ToResp()) } 
+            };
+
             return await Task.FromResult(StatusCode.Ok);
         }
         

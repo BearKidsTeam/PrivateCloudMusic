@@ -1,4 +1,3 @@
-using System;
 using Anemonis.AspNetCore.RequestDecompression;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -25,7 +24,7 @@ namespace Pcm
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            var handler = new MessageHandler();
+            var handler = new ProxyHandler();
             
             if (env.IsDevelopment())
             {
@@ -37,8 +36,9 @@ namespace Pcm
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapPost("/http", async context => await handler.HandleHttp(context));
-                endpoints.MapGet("/music/{id}", async context => await handler.HandleMusic(context));
+                endpoints.MapPost("/http", context => handler.HandleHttp(context));
+                endpoints.MapGet("/music/{id}",  context => handler.HandleMusic(context));
+                endpoints.MapGet("/cover/{id}/{index?}", context => handler.HandleCover(context));
             });
 
             app.Use(async (context, next) =>

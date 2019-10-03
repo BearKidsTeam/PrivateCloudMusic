@@ -5,7 +5,7 @@ namespace Pcm.Proxy.Middlewares
 {
     public class Preset : BaseMiddleware
     {
-        public override Endpoint Create(Endpoint func)
+        public override Endpoint Create(Endpoint next)
         {
             return async (ctx, req, resp) =>
             {
@@ -17,7 +17,7 @@ namespace Pcm.Proxy.Middlewares
 
                 try
                 {
-                    code = await func(ctx, req, resp);
+                    code = await next(ctx, req, resp);
                 }
                 catch (Exception ex)
                 {

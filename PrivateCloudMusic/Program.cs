@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
-using Pcm.Services;
 using Pcm.Utils;
 
 namespace Pcm
@@ -11,15 +10,10 @@ namespace Pcm
         public static void Main(string[] args)
         {
             ConfigManager.Config = new ConfigurationBuilder()
-                .AddJsonFile("config.json", optional: true) //this is not needed, but could be useful
+                .AddJsonFile("config.json", true) //this is not needed, but could be useful
                 .AddEnvironmentVariables()
                 .AddCommandLine(args)
                 .Build();
-            
-            var m = MusicService.Instance.Add(@"/Users/xiaozijin/Downloads/03.オードリー.mp3");
-
-            
-            
             CreateHostBuilder(args).Build().Run();
         }
 

@@ -9,21 +9,55 @@ message GetMusicRequestBody {
     string id = 1;
 }
 
-message GetMusicResponseBody {
-    string title = 1;
-    string album = 2;
-    repeated string genres = 3;
-    repeated string performers = 4;
-    uint32 track = 5;
-    uint32 track_count = 6;
-    string file_name = 7;
-    int32 play_count = 8;
-    int64 length = 9;
-    string mime_type = 10;
-    int64 created_at = 11;
+message ListMusicRequestBody {
+    
+}
+
+message ListByAlbumRequestBody {
+    
+}
+
+message ListByPerformerRequestBody {
+
+}
+
+message ListSearchRequestBody {
+    string keyword = 1;
 }
 
 // response
+
+message GetMusicResponseBody {
+    string id = 1;
+    string title = 2;
+    string album = 3;
+    repeated string genres = 4;
+    repeated string performers = 5;
+    uint32 track = 6;
+    uint32 track_count = 7;
+    string file_name = 8;
+    int32 play_count = 9;
+    int32 picture_count = 10;
+    int64 length = 11;
+    string mime_type = 12;
+    int64 created_at = 13;
+}
+
+message ListMusicResponseBody {
+    repeated GetMusicResponseBody musics = 1;
+}
+
+message ListByAlbumResponseBody {
+    map<string, ListMusicResponseBody> albums = 1;
+}
+
+message ListByPerformerResponseBody {
+    map<string, ListMusicResponseBody> performers = 1;
+}
+
+message ListSearchResponseBody {
+    repeated GetMusicResponseBody musics = 1;
+}
 
 // base
 
@@ -39,47 +73,15 @@ message Request {
 
 message RequestBody {
     GetMusicRequestBody get_music_body = 100;
+    ListMusicRequestBody list_music_body = 200;
+    // 201
+    ListByAlbumRequestBody list_by_album_body = 202;
+    ListByPerformerRequestBody list_by_performer_body = 203;
+    // 204
+    // 205
+    ListSearchRequestBody list_search_body = 206;
 }
 
-enum CMD {
-    CMD_NOT_USED = 0;
-    
-    GET_MUSIC = 100;
-
-    LIST_MUSIC = 200;
-    LIST_PLAYLIST = 201;
-    LIST_ALBUM = 202;
-    LIST_ARTIST = 203;
-    LIST_TYPE = 204;
-    LIST_FOLDER_TREE = 205;
-    
-    GET_PLAYLIST = 300;
-    GET_ALBUM = 301;
-    GET_ARTIST = 302;
-    GET_TYPE = 303;
-    GET_FOLDER = 304;
-    
-    ACTION_RESCAN_MUSIC = 400;
-    ACTION_MODIFY_MUSIC_EXT = 401;
-    ACTION_ADD_MUSIC = 402;
-    ACTION_DELETE_MUSIC = 403;
-    ACTION_CREATE_PLAYLIST = 404;
-    ACTION_RENAME_PLAYLIST = 405;
-    ACTION_ADD_MUSIC_TO_PLAYLIST = 406;
-    ACTION_REMOVE_MUSIC_FROM_PLAYLIST = 407;
-    ACTION_DELETE_PLAYLIST = 408;
-    
-    REPORT_PLAYER_START = 500;
-    REPORT_MUSIC_STOP = 503;
-}
-
-enum Refer {
-    REFER_NOT_USED = 0;
-    ANDROID = 1;
-    IOS = 2;
-    PC = 3;
-    SERVER = 4;
-}
 
 message Response {
     int32 cmd = 1;
@@ -93,6 +95,51 @@ message Response {
 
 message ResponseBody {
     GetMusicResponseBody get_music_body = 100;
+    ListMusicResponseBody list_music_body = 200;
+    // 201
+    ListByAlbumResponseBody list_by_album_body = 202;
+    ListByPerformerResponseBody list_by_performer_body = 203;
+    // 204
+    // 205
+    ListSearchResponseBody list_search_body = 206;
+}
+
+
+enum CMD {
+    CMD_NOT_USED = 0;
+
+    GET_MUSIC = 100;
+
+    LIST_MUSIC = 200;
+    LIST_PLAYLIST = 201;
+    LIST_BY_ALBUM = 202;
+    LIST_BY_PERFORMER = 203;
+    LIST_BY_GENRE = 204;
+    LIST_FOLDER_TREE = 205;
+    LIST_SEARCH = 206;
+
+    GET_PLAYLIST = 300;
+
+    ACTION_RESCAN_MUSIC = 400;
+    ACTION_MODIFY_MUSIC_EXT = 401;
+    ACTION_ADD_MUSIC = 402;
+    ACTION_DELETE_MUSIC = 403;
+    ACTION_CREATE_PLAYLIST = 404;
+    ACTION_RENAME_PLAYLIST = 405;
+    ACTION_ADD_MUSIC_TO_PLAYLIST = 406;
+    ACTION_REMOVE_MUSIC_FROM_PLAYLIST = 407;
+    ACTION_DELETE_PLAYLIST = 408;
+
+    REPORT_PLAYER_START = 500;
+    REPORT_MUSIC_STOP = 503;
+}
+
+enum Refer {
+    REFER_NOT_USED = 0;
+    ANDROID = 1;
+    IOS = 2;
+    PC = 3;
+    SERVER = 4;
 }
 
 enum StatusCode {

@@ -17,17 +17,19 @@ namespace Pcm.Proxy
         {
             var defaultHandler = new DefaultHandler();
             var music = new MusicHandler();
-            var album = new AlbumHandler();
+            var category = new CategoryHandler();
             var playlist = new PlaylistHandler();
             
             register(CMD.NotUsed, defaultHandler.Default); // 0
             register(CMD.GetMusic, music.Get); // 100
             
-            register(CMD.GetPlaylist, playlist.Get); // 200
-            register(CMD.GetAlbum, album.Get); // 201
-            
+            register(CMD.ListMusic, music.List); // 200
+            register(CMD.GetPlaylist, playlist.Get); // 201
+            register(CMD.ListSearch, category.Search); // 206
+
             register(CMD.ListPlaylist, playlist.List); // 301 
-            register(CMD.ListAlbum, album.List); // 302
+            register(CMD.ListByAlbum, category.ListByAlbum); // 302
+            register(CMD.ListByPerformer, category.ListByPerformer); // 303
             
             register(CMD.ActionCreatePlaylist, playlist.Create); // 404
             register(CMD.ActionRenamePlaylist, playlist.Rename); // 405

@@ -12,7 +12,5 @@ namespace Pcm.Entities
         
         [BsonRef("music")]
         public List<Music> Musics { get; set; }
-        
-        public DateTime CreatedAt { get; set; }
     }
 }

@@ -27,6 +27,19 @@
   <ItemGroup>
     <None Remove="Protos\api.proto" />
     <Protobuf Include="Proto\api.proto" />
+    <None Remove="music\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="music\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Remove="music\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Remove="music\**" />
   </ItemGroup>
 
 </Project>

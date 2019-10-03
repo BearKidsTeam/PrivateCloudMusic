@@ -1,8 +1,10 @@
 using System;
 using System.IO;
+using System.Linq;
 using LiteDB;
 using Pcm.Entities;
 using Pcm.Utils;
+using TagLib;
 
 namespace Pcm.Services
 {
@@ -12,22 +14,26 @@ namespace Pcm.Services
         public static MusicService Instance => lazy.Value;
         
         private FileSystemWatcher fsw;
+        public DirectoryInfo MusicDir { get; set; }
 
         private MusicService()
         {
             Collection = DbManager.DB.GetCollection<Music>("music");
             var musicPath = ConfigManager.Get("musicPath", "music");
 
-            var dir = Directory.Exists(musicPath) ? new DirectoryInfo(musicPath) : Directory.CreateDirectory(musicPath);
+            MusicDir = Directory.Exists(musicPath) ? new DirectoryInfo(musicPath) : Directory.CreateDirectory(musicPath);
             
             fsw = new FileSystemWatcher()
             {
-                Path = dir.FullName,
+                Path = MusicDir.FullName,
                 IncludeSubdirectories = true
             };
             fsw.Created += FswOnCreated;
             fsw.Changed += FswOnChanged;
             fsw.Deleted += FswOnDeleted;
+            
+            // init when started
+            Scan();
         }
 
         private void FswOnDeleted(object sender, FileSystemEventArgs e)
@@ -61,34 +67,56 @@ namespace Pcm.Services
 
         public Music Add(string filePath)
         {
-            var exist = Collection.FindOne(t => t.FilePath == filePath);
-            if (exist != null)
+            try
             {
-                return exist;
+                var exist = Collection.FindOne(t => t.FilePath == filePath);
+                if (exist != null)
+                {
+                    return exist;
+                }
+            
+                var tfile = TagLib.File.Create(filePath);
+                
+                if ((tfile.Properties.MediaTypes & MediaTypes.Audio) != 0)
+                {
+                    var id = ObjectId.NewObjectId();
+            
+                    var music = new Music
+                    {
+                        MusicId = id,
+                        Title = tfile.Tag.Title,
+                        Album = tfile.Tag.Album,
+                        Genres = tfile.Tag.Genres,
+                        Performers = tfile.Tag.Performers,
+                        Track = tfile.Tag.Track,
+                        TrackCount = tfile.Tag.TrackCount,
+                        PictureCount = tfile.Tag.Pictures.Count(),
+                        Length = (int)tfile.Properties.Duration.TotalSeconds,
+                        MimeType = tfile.MimeType,
+                        FilePath = filePath,
+                        PlayCount = 0,
+                    };
+            
+                    Collection.Insert(music);
+                    return Get(id.ToString());
+                }
             }
-            
-            var tfile = TagLib.File.Create(filePath);
-
-            var id = ObjectId.NewObjectId();
-            
-            var music = new Music
+            catch
             {
-                MusicId = id,
-                Title = tfile.Tag.Title,
-                Album = tfile.Tag.Album,
-                Genres = tfile.Tag.Genres,
-                Performers = tfile.Tag.Performers,
-                Track = tfile.Tag.Track,
-                TrackCount = tfile.Tag.TrackCount,
-                Length = (int)tfile.Properties.Duration.TotalSeconds,
-                MimeType = tfile.MimeType,
-                FilePath = filePath,
-                PlayCount = 0,
-            };
-            
-            var bsonId = Collection.Insert(music);
+                // ignored
+            }
 
-            return Get(id.ToString());
+            return null;
+        }
+
+        public void Scan()
+        {
+            var files = Directory.GetFiles(MusicDir.FullName, "*.*", SearchOption.AllDirectories)
+                .Where(f => Path.GetFileName(f) != ".DS_Store"); // wtf macOS?
+            foreach (var file in files)
+            {
+                Add(file);
+            }
         }
         
     }
