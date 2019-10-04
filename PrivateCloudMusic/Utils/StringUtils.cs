@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using F23.StringSimilarity;
 
 namespace Pcm.Utils
 {
@@ -45,9 +46,13 @@ namespace Pcm.Utils
             return matrix[bounds.Height - 1, bounds.Width - 1];
         }
         
-        private static readonly Regex _charsReg = new Regex(@"[^\p{IsBasicLatin}\p{IsHiragana}\p{IsKatakana}\p{IsCJKUnifiedIdeographs}\s]", RegexOptions.Compiled);
-        private static readonly Regex _specReg = new Regex("[ \\[ \\] \\^ \\-_*×――(^)（^）$%~!@#$…&%￥—+=<>《》!！??？:：•`·、。，；,.;\"‘’“”'-]", RegexOptions.Compiled);
-
+        private static readonly Regex _charsReg = new Regex(@"[^A-Za-z0-9\p{IsHiragana}\p{IsKatakana}\p{IsCJKUnifiedIdeographs}\s]", RegexOptions.Compiled);
+        private static readonly Regex _specReg = new Regex("[ \\[ \\] \\^ \\-_*×――(^)（^）$%~!@#$…&%￥—+=<>《》!！??？:：•`·、。，；,.;\"‘’“”'-]/", RegexOptions.Compiled);
+        private static readonly Regex _isCjk = new Regex(@"[\p{IsHiragana}\p{IsKatakana}\p{IsCJKUnifiedIdeographs}]", RegexOptions.Compiled);
+        private static readonly Regex _isLatin = new Regex(@"[A-Za-z0-9]", RegexOptions.Compiled);
+        
+        private static readonly JaroWinkler _jw = new JaroWinkler();
+        
         public static string RemoveSpecialCharacters(this string s)
         {
             var strCjk = _charsReg.Replace(s, " ");
@@ -55,9 +60,47 @@ namespace Pcm.Utils
             return rawStr;
         }
 
-        public static int Distance(this string s, IEnumerable<string> t)
-        {
-            return s.RemoveSpecialCharacters().Split(" ").SelectMany(str => t.Select(str.Distance)).Min();
+        public static int Distance(this string content, IEnumerable<string> keywords)
+        { 
+            if (string.IsNullOrEmpty(content))
+            {
+                return int.MaxValue;
+            }
+
+            return content.RemoveSpecialCharacters().Split(" ", StringSplitOptions.RemoveEmptyEntries)
+                .SelectMany(contentSplit => 
+                    keywords.Select(keyword =>
+                        {
+                            var dbg = content.ToString();
+
+                            if (keyword.Length > contentSplit.Length)
+                            {
+                                return int.MaxValue;
+                            }
+                            
+                            var kwIsCjk = _isCjk.IsMatch(keyword);
+                            var kwIsLatin = _isLatin.IsMatch(keyword);
+                            var ctIsCjk = _isCjk.IsMatch(contentSplit);
+                            var ctIsLatin = _isLatin.IsMatch(contentSplit);
+
+                            var kwIsCjkOnly = kwIsCjk && !kwIsLatin;
+                            var kwIsLatinOnly = !kwIsCjk && kwIsLatin;
+                            var ctIsCjkOnly = ctIsCjk && !ctIsLatin;
+                            var ctIsLatinOnly = !ctIsCjk && ctIsLatin;
+
+                            if (kwIsCjkOnly && ctIsCjkOnly)
+                            {
+                                return contentSplit.Contains(keyword) ? 0 : int.MaxValue;
+                            }
+
+                            if (kwIsCjkOnly && ctIsLatinOnly || kwIsLatinOnly && ctIsCjkOnly)
+                            {
+                                return int.MaxValue;
+                            }
+                            
+                            return Distance(keyword, contentSplit);
+                        }))
+                        .Min();
         }
     }
 }

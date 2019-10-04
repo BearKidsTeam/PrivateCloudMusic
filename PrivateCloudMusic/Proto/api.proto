@@ -29,6 +29,10 @@ message ListByAlbumArtistsRequestBody {
 
 }
 
+message ListByAlbumArtistsGroupByAlbumRequestBody {
+    
+}
+
 // response
 
 message GetMusicResponseBody {
@@ -68,6 +72,10 @@ message ListByAlbumArtistsResponseBody {
     map<string, ListMusicResponseBody> artists = 1;
 }
 
+message ListByAlbumArtistsGroupByAlbumResponseBody {
+    map<string, ListByAlbumResponseBody> artists = 1;
+}
+
 // base
 
 message Request {
@@ -90,6 +98,7 @@ message RequestBody {
     // 205
     ListSearchRequestBody list_search_body = 206;
     ListByAlbumArtistsRequestBody list_by_album_artist_body = 207;
+    ListByAlbumArtistsGroupByAlbumRequestBody list_by_album_artist_group_by_album_body = 208;
 }
 
 
@@ -113,11 +122,13 @@ message ResponseBody {
     // 205
     ListSearchResponseBody list_search_body = 206;
     ListByAlbumArtistsResponseBody list_by_album_artist_body = 207;
+    ListByAlbumArtistsGroupByAlbumResponseBody list_by_album_artist_group_by_album_body = 208;
 }
 
 
 enum CMD {
     CMD_NOT_USED = 0;
+    AUTH = 1;
 
     GET_MUSIC = 100;
 
@@ -129,6 +140,7 @@ enum CMD {
     LIST_FOLDER_TREE = 205;
     LIST_SEARCH = 206;
     LIST_BY_ALBUM_ARTIST = 207;
+    LIST_BY_ALBUM_ARTIST_GROUP_BY_ALBUM = 208;
 
     GET_PLAYLIST = 300;
 

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using LiteDB;
@@ -65,6 +66,33 @@ namespace Pcm.Services
             return Collection.FindById(oid);
         }
 
+        public IEnumerable<Music> GetAlbum(string name)
+        {
+            var musics =  Collection.FindAll()
+                .Where(t => t.Album == name)
+                .OrderBy(m => m.Track);
+            
+            if (!musics.Any())
+            {
+                return new List<Music>();
+            }
+            
+            // fix error trackCount on-the-fly, return max track as trackCount
+            // currently do not save to database
+            // only fix it when group by album
+            var maxTrack = musics.Select(m => m.Track).Max();
+            return musics.Select(t =>
+            {
+                if (t.TrackCount == 0)
+                {
+                    t.TrackCount = maxTrack;
+                }
+                
+                return t;
+                
+            });
+        }
+
         public Music Add(string filePath)
         {
             try
@@ -85,7 +113,7 @@ namespace Pcm.Services
                     {
                         MusicId = id,
                         Title = tfile.Tag.Title,
-                        Album = tfile.Tag.Album,
+                        Album = tfile.Tag.Album ?? "Unknown",
                         Genres = tfile.Tag.Genres,
                         Performers = tfile.Tag.Performers,
                         AlbumArtists = tfile.Tag.AlbumArtists,

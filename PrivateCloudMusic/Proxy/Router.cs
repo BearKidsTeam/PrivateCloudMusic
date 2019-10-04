@@ -19,18 +19,22 @@ namespace Pcm.Proxy
             var music = new MusicHandler();
             var category = new CategoryHandler();
             var playlist = new PlaylistHandler();
-            
+            var folder = new FolderHandler();
+
             register(CMD.NotUsed, defaultHandler.Default); // 0
             register(CMD.GetMusic, music.Get); // 100
             
             register(CMD.ListMusic, music.List); // 200
-            register(CMD.GetPlaylist, playlist.Get); // 201
+            register(CMD.ListPlaylist, playlist.List); // 201 
+            register(CMD.ListByAlbum, category.ListByAlbum); // 202
+            register(CMD.ListByPerformer, category.ListByPerformer); // 203
+            register(CMD.ListByGenre, category.ListByGenre); // 204
+            register(CMD.ListFolderTree, folder.GetTree); // 205
             register(CMD.ListSearch, category.ListSearch); // 206
-            register(CMD.ListByAlbumArtist, category.ListByAlbumArtist);
+            register(CMD.ListByAlbumArtist, category.ListByAlbumArtist); // 207
+            register(CMD.ListByAlbumArtistGroupByAlbum, category.ListByAlbumArtistsGroupByAlbum); // 208
 
-            register(CMD.ListPlaylist, playlist.List); // 301 
-            register(CMD.ListByAlbum, category.ListByAlbum); // 302
-            register(CMD.ListByPerformer, category.ListByPerformer); // 303
+            register(CMD.GetPlaylist, playlist.Get); // 300
             
             register(CMD.ActionCreatePlaylist, playlist.Create); // 404
             register(CMD.ActionRenamePlaylist, playlist.Rename); // 405
